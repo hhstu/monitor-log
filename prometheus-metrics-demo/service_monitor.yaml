@@ -1,0 +1,49 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: lc-demo-app
+  name: lc-demo-app
+  namespace: kube-system
+spec:
+  endpoints:
+    - interval: 1m
+      port: http
+      scheme: http
+  jobLabel: lc-demo-app
+  selector:
+    matchLabels:
+      app: lc-demo-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: lc-demo-app
+  name: lc-demo-app
+  namespace: kube-system
+spec:
+  clusterIP: None
+  ports:
+    - name: http
+      port: 21112
+      protocol: TCP
+      targetPort: 9100
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app: lc-demo-app
+  name: lc-demo-app
+  namespace: kube-system
+subsets:
+  - addresses:
+      - ip: 172.20.60.37
+        nodeName: node37
+    ports:
+      - name: http
+        port: 21112
+        protocol: TCP
